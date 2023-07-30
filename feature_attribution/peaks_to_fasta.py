@@ -1,28 +1,28 @@
-import pysam
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import pysam
 import seaborn as sns
 
-data_path = '/media/labuser/STORAGE/GraphReg'   # data path
+data_path = "/media/labuser/STORAGE/GraphReg"  # data path
 
-fasta_open = pysam.Fastafile(data_path+'/data/genome/hg19.ml.fa')
-peaks_fasta = open(data_path+'/results/fimo/peaks_H3K27ac_K562.fasta', "w")
-peaks_bed = pd.read_csv(data_path+'/data/csv/K562_H3K27ac_peaks.bed', sep="\t", header=None)
+fasta_open = pysam.Fastafile(data_path + "/data/genome/hg19.ml.fa")
+peaks_fasta = open(data_path + "/results/fimo/peaks_H3K27ac_K562.fasta", "w")
+peaks_bed = pd.read_csv(data_path + "/data/csv/K562_H3K27ac_peaks.bed", sep="\t", header=None)
 peaks_bed = peaks_bed.sort_values(by=[0, 1]).reset_index(drop=True)
-peaks_bed = peaks_bed[((peaks_bed[0] != 'chrX') & (peaks_bed[0] != 'chrY'))].reset_index(drop=True)
+peaks_bed = peaks_bed[((peaks_bed[0] != "chrX") & (peaks_bed[0] != "chrY"))].reset_index(drop=True)
 
 N = len(peaks_bed)
 for i in range(N):
     chrm = peaks_bed[0].values[i]
     start = peaks_bed[1].values[i]
     end = peaks_bed[2].values[i]
-    line = '>'+chrm+':'+str(start)+'-'+str(end)
+    line = ">" + chrm + ":" + str(start) + "-" + str(end)
     peaks_fasta.write(line)
-    peaks_fasta.write('\n')
+    peaks_fasta.write("\n")
     seq_dna = fasta_open.fetch(chrm, start, end)
     peaks_fasta.write(seq_dna)
-    peaks_fasta.write('\n')
+    peaks_fasta.write("\n")
 
 peaks_fasta.close()
 
@@ -39,20 +39,19 @@ peaks_fasta.close()
 # print('TFs: ', TFs)
 # fimo_out_df.to_csv(data_path+'/results/fimo/peaks_H3K27ac_K562/TF_positions_unique.bed', sep="\t", header=False, index=False)
 
-fimo_out_df = pd.read_csv(data_path+'/results/fimo/peaks_H3K27ac_K562/TF_positions_unique.bed', sep="\t")
-fimo_out_df.columns = ['chr', 'start', 'end', 'TF', '-log10(pval)', 'strand']
-TFs = np.unique(fimo_out_df['TF'].values)
-print('TFs: ', TFs)
+fimo_out_df = pd.read_csv(data_path + "/results/fimo/peaks_H3K27ac_K562/TF_positions_unique.bed", sep="\t")
+fimo_out_df.columns = ["chr", "start", "end", "TF", "-log10(pval)", "strand"]
+TFs = np.unique(fimo_out_df["TF"].values)
+print("TFs: ", TFs)
 
 N = len(TFs)
 n_TF = np.zeros(N)
 for i in range(N):
-    n_TF[i] = len(fimo_out_df[fimo_out_df['TF']==TFs[i]])
+    n_TF[i] = len(fimo_out_df[fimo_out_df["TF"] == TFs[i]])
 n_TF = n_TF.astype(np.int64)
-print('n_TF: ', n_TF)
+print("n_TF: ", n_TF)
 
-df = pd.DataFrame(data=n_TF, index=list(TFs), columns=['Number'])
-df = df.sort_values(by=['Number'])
-plt.figure(figsize = (2,10))
+df = pd.DataFrame(data=n_TF, index=list(TFs), columns=["Number"])
+df = df.sort_values(by=["Number"])
+plt.figure(figsize=(2, 10))
 ax = sns.heatmap(df, xticklabels=1, yticklabels=1, cmap="YlGnBu", annot=df, fmt="d")
-

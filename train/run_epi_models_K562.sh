@@ -24,4 +24,3 @@ python Epi-GraphReg_distal_reg.py -c K562 -p $data_path -a HiC -g 1 -q .001 -v c
 # python Epi-CNN.py -c K562 -p $data_path -a HiC -g 1 -q .1 -v 9,19 -t 10,20
 # python Epi-CNN.py -c K562 -p $data_path -a HiC -g 1 -q .1 -v 10,20 -t 11,21
 # python Epi-CNN.py -c K562 -p $data_path -a HiC -g 1 -q .1 -v 11,21 -t 1,22
-
